@@ -1,0 +1,42 @@
+version: "2"
+
+services:
+
+  kannel:
+    image: antenehrepos/docker-kannel
+    container_name: kannel
+    ports:
+      - "13013:13013" # smsbox
+      - "13000:13000" # kannel admin
+    extra_hosts:
+     - "host:172.19.0.1"
+    networks:
+      default_net:
+        ipv4_address: 172.20.238.10 #giving static IP
+        ipv6_address: 2001:3984:3989::10
+
+  asterisk:
+    image: antenehrepos/docker-asterisk
+    container_name: asterisk
+    ports:
+      - "5060:5060"
+      - "5038:5038"
+    extra_hosts:
+     - "host:172.19.0.1"
+    networks:
+      default_net:
+        ipv4_address: 172.20.238.12 #giving static IP to provide access from host on SIP configuration
+        ipv6_address: 2001:3984:3989::12
+
+networks:
+  default_net:
+    driver: bridge
+    driver_opts:
+      com.docker.network.enable_ipv6: "true"
+    ipam:
+      driver: default
+      config:
+      - subnet: 172.20.238.0/24
+        gateway: 172.20.238.1
+      - subnet: 2001:3984:3989::/64
+        gateway: 2001:3984:3989::1
